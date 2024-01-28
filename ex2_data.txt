@@ -1,0 +1,55 @@
+
+CREATE 
+	(keanu_reeves:Person {name:"Keanu", lastName:"Reeves", nick:"Kean" , account:"Keanu123" }),
+	(alejandro:Person {name:"Alejandro", lastName:"García", nick:"Alex", account:"Alex45" }),
+	(james_cromwell:Person {name:"James Oliver", lastName:"Cromwell", nick:"Oliv", account:"OliverC35" }),
+	(james_mcAvoy:Person {name:"James", lastName:"McAvoy", nick:"Jamy", account:"JamM28" }),
+	(james_marsden:Person {name:"James Paul", lastName:"Marsden", nick:"J", account:"JP_45" }),
+	(james_franco:Person {name:"James Edward", lastName:"Franco", nick:"Ed", account:"Jed39" }),
+	(bryan:Person {name:"Bryan", lastName:"Singer", nick:"Bry", account:"Bry356" }),
+	(sam_raimi:Person {name:"Sam", lastName:"Raimi", nick:"Samy", account:"Sam356" }),
+	(tobias_maguire:Person {name:"Tobias Vincent", lastName:"Maguire", nick:"Toby", account:"Toby198" }),
+	(frank_darabont:Person {name:"Frank Árpád ", lastName:"Darabont", nick:"Franky", account:"Franky223" }),
+	(lana_wachowski:Person {name:"Lana", lastName:"Wachowski", nick:"Lan", account:"Lam476" }),
+	(courtney_hunt:Person {name:"Courtney", lastName:"Hunt", nick:"Court", account:"Court_56" }),
+
+	(x_men:Movie {title:"X-Men" , premierDate: date("2000-07-14") , budget:75000000 }),
+	(spider_man:Movie {title:"Spider-Man" , premierDate: date("2010-08-05"), budget: 35000000}),
+	(the_green_mile:Movie {title:"The Green Mile" , premierDate: date("1999-12-02") , budget:500000 }),
+	(the_matrix:Movie {title:"The Matrix" , premierDate: date("2013-05-13") , budget:758000000}),
+	(the_whole_truth:Movie {title:"The Whole Truth" , premierDate: date("2016-09-18") , budget:30000000 }),
+
+	(james_mcAvoy)-[:ACTED_IN {role:"Secundary" }]->(x_men),
+	(james_marsden)-[:ACTED_IN {role:"Secundary" }]->(x_men),
+	(james_franco)-[:ACTED_IN {role:"Secundary" }]->(spider_man),
+	(tobias_maguire)-[:ACTED_IN {role:"Main" }]->(spider_man),
+	(james_cromwell)-[:ACTED_IN {role:"Main" }]->(the_green_mile),
+	(keanu_reeves)-[:ACTED_IN {role:"Main" }]->(the_matrix),
+	(keanu_reeves)-[:ACTED_IN {role:"Main" }]->(the_whole_truth),
+
+	(bryan)-[:DIRECTED]->(x_men),
+	(sam_raimi)-[:DIRECTED]->(spider_man),
+	(frank_darabont)-[:DIRECTED]->(the_green_mile),
+	(lana_wachowski)-[:DIRECTED]->(the_matrix),
+	(courtney_hunt)-[:DIRECTED]->(the_whole_truth),
+	
+
+	(alejandro)-[:RECOMMEND]->(the_matrix),
+	(courtney_hunt)-[:RECOMMEND]->(the_matrix),
+	(james_franco)-[:RECOMMEND]->(the_matrix),
+	(tobias_maguire)-[:RECOMMEND]->(the_matrix),
+	(alejandro)-[:RECOMMEND]->(spider_man),
+	(alejandro)-[:RECOMMEND]->(x_men),
+	(sam_raimi)-[:RECOMMEND]->(the_whole_truth),
+
+	
+	(alejandro)-[:FRIEND_OF {Friend_Since: date("2003-06-05")}]->(keanu_reeves),
+	(alejandro)-[:FRIEND_OF {Friend_Since: date("2016-10-16")}]->(james_cromwell),
+	(alejandro)-[:FRIEND_OF {Friend_Since: date("2020-03-10")}]->(james_mcAvoy),
+	(keanu_reeves)-[:FRIEND_OF {Friend_Since: date("2013-09-13")}]->(james_marsden),
+	(keanu_reeves)-[:FRIEND_OF {Friend_Since: date("1999-12-19")}]->(james_franco),
+	(james_cromwell)-[:FRIEND_OF {Friend_Since: date("2019-10-20")}]->(bryan),
+	(james_mcAvoy)-[:FRIEND_OF {Friend_Since: date("2021-09-01")}]->(sam_raimi),
+	(james_mcAvoy)-[:FRIEND_OF {Friend_Since: date("2011-11-15")}]->(lana_wachowski)
+	
+

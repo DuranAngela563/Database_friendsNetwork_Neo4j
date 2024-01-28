@@ -1,0 +1,214 @@
+
+// ******************	EX 1  ******************
+
+WITH true as pass
+  //Drills                      
+//2.1
+CALL db.schema.visualization
+
+// 2.2
+MATCH(n) RETURN n
+
+// 2.3. 
+
+MATCH p=shortestPath((a:Planet {name:"Alderaan"})-[*]->(b:Planet {name:"Tatooine"})) RETURN p
+
+
+MATCH (start:Planet{name:"Tatooine"}), (end:Planet{name:"Alderaan"})
+CALL algo.shortestPath.stream(start, end, "cost")
+YIELD nodeId, cost
+MATCH (other:Planet) WHERE id(other) = nodeId
+RETURN other.name AS name, cost
+
+////////////
+
+MATCH (source:Planet {name: "Tatooine"}), (target:Planet {name: "Alderaan"})
+CALL gds.shortestPath.dijkstra.stream('myGraph', {
+    sourceNode: source,
+    targetNode: target,
+  
+})
+YIELD  sourceNode, targetNode, path
+RETURN
+  
+    [nodeId IN nodeIds | gds.util.asNode(nodeId).name] AS nodeNames,
+    
+    nodes(path) as path
+
+////////////////
+
+
+MATCH (source:Location {name: 'A'}), (target:Location {name: 'F'})
+CALL gds.shortestPath.dijkstra.stream('myGraph', {
+    sourceNode: source,
+    targetNode: target,
+    relationshipWeightProperty: 'cost'
+})
+YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path
+RETURN
+    index,
+    gds.util.asNode(sourceNode).name AS sourceNodeName,
+    gds.util.asNode(targetNode).name AS targetNodeName,
+    totalCost,
+    [nodeId IN nodeIds | gds.util.asNode(nodeId).name] AS nodeNames,
+    costs,
+    nodes(path) as path
+ORDER BY index
+
+
+//2.4
+MATCH (p:Planet)-[:AFFILIATED_TO]->(s:Political_System) RETURN DISTINCT s.system as Political_System, count(p) as NumPlanets ORDER BY count(p) DESC
+
+
+//2.5
+
+MATCH (s:Sector)-[:CONTAINS]->(p1:Planet)-[:AFFILIATED_TO]->(s1:Political_System),
+(s2:Political_System)<-[:AFFILIATED_TO]-(p2:Planet)-[:BELONGS_TO]->(r:Region)
+WHERE s1.system = 'Galactic Empire', s2.system = 'Galactic Empire'
+RETURN s.name as ListSectors, count(p1) as NunPlanetsSec ORDER BY count(p1), r.name as ListRegions, count(p2) ORDER BY count(p2)
+
+
+MATCH (s:Sector)-[:CONTAINS]->(p:MATCH (p1:Planet)-[:AFFILIATED_TO]->(s1:Political_System) WHERE s1.system = 'Galactic Empire' RETURN p1 )-[:BELONGS_TO]->(r:Region)
+
+RETURN s.name as ListSectors, r.name as ListRegions,  count(p) as NunPlanetsSec ORDER BY count(p) DESC
+
+labels(r) as Type
+
+//2.6
+MATCH (p:Planet)-[re:BELONGS_TO]->(r:Region) WHERE r.name = "Inner Rim" RETURN p,re,r
+
+
+//2.7
+MATCH p=shortestPath((a:Sector {name:"Trans-Nebular"})-[*]->(b:Planet {name:"Pii"})) RETURN p
+
+
+
+
+//2.8
+MATCH (s:Sector)-[r1:CONTAINS]->(p:Planet)-[r2:AFFILIATED_TO]->(ps:Political_System)
+WHERE  s.name ='Colonies' AND ps.system ='Galactic Republic'
+RETURN s, r1, p,r2,ps
+
+
+
+// **************  EX2  *****************
+
+//2.1
+
+CREATE (:Person {name:, lastName:, nick:, account: }),
+(:Movie {title: , premierDate: , budget: }),
+(a:Person)-[:FRIEND_OF {Friend_Since: date}]->(b:Person),
+
+!!!! Can't create node `james_mcAvoy` with labels or properties here. The variable is already declared in this context neo4j
+!!!! Remove label from a:Person... in declaring relationships ( it will be an indication of the node creation, but this node previously created):
+(a:Person)-[:ACTED_IN {role: }]->(m:Movie),  -> (a)-[:ACTED_IN {role: }]->(m),  
+(a:Person)-[:DIRECTED]->(m:Movie),
+(a:Person)-[:RECOMMEND]->(m:Movie),
+
+// (a:Person)-[:ACTED_IN {role: , directed; ,recommend: }]->(m:Movie)
+
+
+
+
+
+CREATE 
+	(keanu_reeves:Person {name:"Keanu", lastName:"Reeves", nick:"Kean" , account:"Keanu123" }),
+	(alejandro:Person {name:"Alejandro", lastName:"García", nick:"Alex", account:"Alex45" }),
+	(james_cromwell:Person {name:"James Oliver", lastName:"Cromwell", nick:"Oliv", account:"OliverC35" }),
+	(james_mcAvoy:Person {name:"James", lastName:"McAvoy", nick:"Jamy", account:"JamM28" }),
+	(james_marsden:Person {name:"James Paul", lastName:"Marsden", nick:"J", account:"JP_45" }),
+	(james_franco:Person {name:"James Edward", lastName:"Franco", nick:"Ed", account:"Jed39" }),
+	(bryan:Person {name:"Bryan", lastName:"Singer", nick:"Bry", account:"Bry356" }),
+	(sam_raimi:Person {name:"Sam", lastName:"Raimi", nick:"Samy", account:"Sam356" }),
+	(tobias_maguire:Person {name:"Tobias Vincent", lastName:"Maguire", nick:"Toby", account:"Toby198" }),
+	(frank_darabont:Person {name:"Frank Árpád ", lastName:"Darabont", nick:"Franky", account:"Franky223" }),
+	(lana_wachowski:Person {name:"Lana", lastName:"Wachowski", nick:"Lan", account:"Lam476" }),
+	(courtney_hunt:Person {name:"Courtney", lastName:"Hunt", nick:"Court", account:"Court_56" }),
+
+	(x_men:Movie {title:"X-Men" , premierDate: date("2000-07-14") , budget:75000000 }),
+	(spider_man:Movie {title:"Spider-Man" , premierDate: date("2010-08-05"), budget: 35000000}),
+	(the_green_mile:Movie {title:"The Green Mile" , premierDate: date("1999-12-02") , budget:500000 }),
+	(the_matrix:Movie {title:"The Matrix" , premierDate: date("2013-05-13") , budget:758000000}),
+	(the_whole_truth:Movie {title:"The Whole Truth" , premierDate: date("2016-09-18") , budget:30000000 }),
+
+	(james_mcAvoy)-[:ACTED_IN {role:"Secundary" }]->(x_men),
+	(james_marsden)-[:ACTED_IN {role:"Secundary" }]->(x_men),
+	(james_franco)-[:ACTED_IN {role:"Secundary" }]->(spider_man),
+	(tobias_maguire)-[:ACTED_IN {role:"Main" }]->(spider_man),
+	(james_cromwell)-[:ACTED_IN {role:"Main" }]->(the_green_mile),
+	(keanu_reeves)-[:ACTED_IN {role:"Main" }]->(the_matrix),
+	(keanu_reeves)-[:ACTED_IN {role:"Main" }]->(the_whole_truth),
+
+	(bryan)-[:DIRECTED]->(x_men),
+	(sam_raimi)-[:DIRECTED]->(spider_man),
+	(frank_darabont)-[:DIRECTED]->(the_green_mile),
+	(lana_wachowski)-[:DIRECTED]->(the_matrix),
+	(courtney_hunt)-[:DIRECTED]->(the_whole_truth),
+	
+
+	(alejandro)-[:RECOMMEND]->(the_matrix),
+	(courtney_hunt)-[:RECOMMEND]->(the_matrix),
+	(james_franco)-[:RECOMMEND]->(the_matrix),
+	(tobias_maguire)-[:RECOMMEND]->(the_matrix),
+	(alejandro)-[:RECOMMEND]->(spider_man),
+	(alejandro)-[:RECOMMEND]->(x_men),
+	(sam_raimi)-[:RECOMMEND]->(the_whole_truth),
+
+	
+	(alejandro)-[:FRIEND_OF {Friend_Since: date("2003-06-05")}]->(keanu_reeves),
+	(alejandro)-[:FRIEND_OF {Friend_Since: date("2016-10-16")}]->(james_cromwell),
+	(alejandro)-[:FRIEND_OF {Friend_Since: date("2020-03-10")}]->(james_mcAvoy),
+	(keanu_reeves)-[:FRIEND_OF {Friend_Since: date("2013-09-13")}]->(james_marsden),
+	(keanu_reeves)-[:FRIEND_OF {Friend_Since: date("1999-12-19")}]->(james_franco),
+	(james_cromwell)-[:FRIEND_OF {Friend_Since: date("2019-10-20")}]->(bryan),
+	(james_mcAvoy)-[:FRIEND_OF {Friend_Since: date("2021-09-01")}]->(sam_raimi),
+	(james_mcAvoy)-[:FRIEND_OF {Friend_Since: date("2011-11-15")}]->(lana_wachowski)
+	
+
+
+
+
+(:Movie {title: , premierDate: , budget: }),
+(a:Person)-[:FRIEND_OF {Friend_Since: date}]->(b:Person),
+
+(a:Person)-[:ACTED_IN {role: }]->(m:Movie)
+(a:Person)-[:DIRECTED]->(m:Movie)
+(a:Person)-[:RECOMMEND]->(m:Movie)
+
+
+
+
+
+
+
+
+
+//2.2
+CALL db.schema.visualization
+
+//2.3
+MATCH (n) return n
+
+//2.4
+MATCH (p:Person)-[:RECOMMEND]->(m:Movie) WHERE m.title = "The Matrix" RETURN p.name
+
+//2.5 
+MATCH (p:Person)-[:ACTED_IN]->(m:movie) WHERE p.name = "Keanu Reeves"	RETURN m.title
+
+//2.6
+MATCH (p2:Person)<-[:FRIEND_OF]-(p1:Person)-[RECOMMEND]->(m:Movie)	WHERE p1.name = "Alejandro" 	RETURN collect(p2.name) as Friends, collect(m.title) as RecommendedMovies
+
+//2.7
+MATCH (p1:Person)-[:FRIEND_OF]->(p2:Person)-[:FRIEND_OF]->(p3:Person)	WHERE p1.name = "Alejandro"	RETURN p3.name
+
+//2.8
+MATCH (p:Person)-[ACTED_IN]->(m:Movie)	WHERE p.name STARTS WITH "James"	RETURN p.name
+
+//2.9
+MATCH	(d:Person)-[:DIRECTED]->(m:Movie)<-[:ACTED_IN]-(p:Person)	RETURN d.name, count(p), collect(p.name)
+
+
+
+
+
+
